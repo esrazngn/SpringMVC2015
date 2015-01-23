@@ -1,0 +1,3 @@
+eclipse.preferences.version=1
+module-start-timeout=300000
+runtimes=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\r\n<runtimes>\r\n  <runtime com.springsource.tcserver.version\="tomcat-7.0.55.A.RELEASE" id\="VMware vFabric tc Server v2.5 - v2.9" location\="C\:/Users/Esra/Desktop/sts-bundle/pivotal-tc-server-developer-3.0.0.RELEASE" name\="VMware vFabric tc Server v2.5 - v2.9" runtime-type-id\="com.vmware.server.tc.runtime.70" timestamp\="0" vm-install-id\="1416046589457" vm-install-type-id\="org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType"/>\r\n</runtimes>\r\n

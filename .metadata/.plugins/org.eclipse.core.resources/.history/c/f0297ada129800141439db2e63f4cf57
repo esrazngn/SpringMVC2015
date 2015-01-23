@@ -1,0 +1,21 @@
+package com.mkyong.stock;
+
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+
+@Entity
+@Table(name = "ogrenci", catalog = "deneme")
+public class Urun {
+	
+	private int urunID;
+	private String urunAdi;
+	private String aciklama;
+	private Double fiyat;
+	private User user;
+	private Foto fotoID;
+	private Kategori kategoriID;
+	
+	
+
+}

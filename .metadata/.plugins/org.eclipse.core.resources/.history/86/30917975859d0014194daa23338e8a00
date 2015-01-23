@@ -1,0 +1,283 @@
+package com.mkyong;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+
+import com.mkyong.stock.Foto;
+import com.mkyong.stock.Kategori;
+import com.mkyong.stock.Person;
+import com.mkyong.stock.Sira;
+import com.mkyong.stock.Urun;
+import com.mkyong.stock.User;
+import com.mkyong.util.HibernateUtil;
+
+public class App2 {
+
+	public static void main(String[] args) {
+		App2 a = new App2();
+		// a.listPersonInfo();
+		// User user =a.getUserById("zngn55");ç
+		// System.out.println(user.getName()+" adi");
+		// Urun urun = a.getUrunById(10);
+		// System.err.println("urun adi: " + urun.getUrunAdi());
+		/*
+		 * User user = a.addUser(); Foto foto = a.addFoto(); Kategori kategori =
+		 * a.addKategori(); a.AddUrun(user, foto, kategori);
+		 */
+		//System.out.println("sonuc: " + a.giris("admin", 123));
+		// System.err.println("sonuc: "+a.getAllUrun().get(0).getUrunAdi());
+		System.err.println("sonuc: "+a.urunKaldir(10));
+	}
+
+	public boolean urunKaldir(int urunID){
+		boolean durum = true;
+        Transaction trns = null;
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            trns = session.beginTransaction();
+            Urun urun = (Urun) session.load(Urun.class, new Integer(urunID));
+            session.delete(urun);
+            session.getTransaction().commit();
+        } catch (RuntimeException e) {
+        	durum = false;
+            if (trns != null) {
+                trns.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+        	
+            session.flush();
+            session.close();
+        }
+        return durum;
+		
+		
+	}
+	
+	
+	public boolean giris(String username, int password)
+	{
+		boolean durum = false;
+
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		Transaction transaction = null;
+	
+			transaction = session.beginTransaction();
+			@SuppressWarnings("unchecked")
+			List<User> personList = session.createQuery("FROM User").list();
+			System.out.println("List size: " + (personList).size());
+			for (Iterator iterator = personList.iterator(); iterator.hasNext();) {
+				User person = (User) iterator.next();
+				System.err.println(person.getUsername()+"sifresi: "+person.getPassword());
+				if(person.getUsername().equals(username) & person.getPassword()==password)
+					durum = true;
+				
+			}
+			session.close();
+				return durum;
+
+	}
+
+	public Kategori addKategori() {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+
+		session.beginTransaction();
+
+		Kategori kategori = new Kategori();
+		kategori.setKategoriID(1111);
+		kategori.setKategoriAdi("Genel3");
+
+		session.save(kategori);
+
+		session.getTransaction().commit();
+
+		System.out.println("Done");
+		return kategori;
+
+	}
+	
+	public void listperson() {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		Transaction transaction = null;
+		try {
+			transaction = session.beginTransaction();
+			@SuppressWarnings("unchecked")
+			List<User> personList = session.createQuery("FROM User").list();
+
+			System.out.println("List size: " + (personList).size());
+			for (Iterator iterator = personList.iterator(); iterator.hasNext();) {
+				User person = (User) iterator.next();
+				Set<Urun> urun = new HashSet<Urun>();
+				urun = person.getUrun();
+				for (Urun u : urun) {
+					System.out.println("***************************");
+					System.out.println(person.getName());
+
+					System.out.println("***************************");
+				}
+			}
+			transaction.commit();
+		} catch (HibernateException e) {
+			transaction.rollback();
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+		
+	}
+
+	public Foto addFoto() {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+
+		session.beginTransaction();
+
+		Foto foto = new Foto();
+		foto.setFotoID(3);
+		foto.setUrl("yol3");
+
+		session.save(foto);
+		session.getTransaction().commit();
+
+		System.out.println("Done");
+		return foto;
+	}
+
+	public User addUser() {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+
+		session.beginTransaction();
+
+		User user = new User();
+		user.setUsername("zn5511");
+		user.setAdres("Samsunlll");
+		user.setName("Esrakk");
+		user.setPassword(123);
+		user.setPhone(123121);
+		user.setSurname("Zengin");
+
+		session.save(user);
+		session.getTransaction().commit();
+
+		System.out.println("Done");
+		return user;
+
+	}
+
+	public void AddUrun(User user, Foto foto, Kategori kategori) {
+		System.out.println("Hibernate one to many (Annotation)");
+		Session session = HibernateUtil.getSessionFactory().openSession();
+
+		session.beginTransaction();
+
+		Urun urun = new Urun();
+		urun.setAciklama("Aciklamalaraaa");
+		urun.setFiyat(new Double(10.0));
+		urun.setFoto(foto);
+		urun.setKategori(kategori);
+		urun.setUrunAdi("urun4");
+		urun.setUrunID(14);
+		urun.setUser(user);
+
+		user.getUrun().add(urun);
+		foto.getUrun().add(urun);
+		kategori.getUrun().add(urun);
+
+		session.save(urun);
+		session.getTransaction().commit();
+
+		System.out.println("Done");
+
+	}
+
+	public void listPersonInfo() {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		Transaction transaction = null;
+		try {
+			transaction = session.beginTransaction();
+			@SuppressWarnings("unchecked")
+			List<User> personList = session.createQuery("FROM User").list();
+
+			System.out.println("List size: " + (personList).size());
+			for (Iterator iterator = personList.iterator(); iterator.hasNext();) {
+				User person = (User) iterator.next();
+				Set<Urun> urun = new HashSet<Urun>();
+				urun = person.getUrun();
+				for (Urun u : urun) {
+					System.out.println("***************************");
+					System.out.println(person.getName());
+
+					System.out.println("***************************");
+				}
+			}
+			transaction.commit();
+		} catch (HibernateException e) {
+			transaction.rollback();
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+
+	}
+
+	public User getUserById(String username) {
+		User user = null;
+		Transaction trns = null;
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		try {
+			trns = session.beginTransaction();
+			String queryString = "from User where username = :username";
+			Query query = session.createQuery(queryString);
+			query.setString("username", username);
+			user = (User) query.uniqueResult();
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+		} finally {
+			session.flush();
+			session.close();
+		}
+		return user;
+	}
+
+	public Urun getUrunById(int urunID) {
+		Urun urun = null;
+		Transaction trns = null;
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		try {
+			trns = session.beginTransaction();
+			String queryString = "from Urun where urunID = :urunID";
+			Query query = session.createQuery(queryString);
+			query.setInteger("urunID", urunID);
+			urun = (Urun) query.uniqueResult();
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+		} finally {
+			session.flush();
+			session.close();
+		}
+		return urun;
+	}
+
+	public List<Urun> getAllUrun() {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		Transaction transaction = null;
+
+		transaction = session.beginTransaction();
+		@SuppressWarnings("unchecked")
+		List<Urun> urunList = session.createQuery("FROM Urun").list();
+
+		System.out.println("List size: " + (urunList).size());
+		transaction.commit();
+
+		session.close();
+
+		return urunList;
+
+	}
+}
